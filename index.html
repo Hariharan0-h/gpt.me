@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guru Gpt - Code Converter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 25%, #2563eb 50%, #3b82f6 75%, #60a5fa 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 25px 35px;
+            margin-bottom: 35px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1e40af;
+            text-shadow: 0 2px 4px rgba(30, 64, 175, 0.1);
+        }
+
+        .api-key-input {
+            padding: 12px 18px;
+            border: 2px solid rgba(59, 130, 246, 0.2);
+            border-radius: 12px;
+            font-size: 14px;
+            width: 320px;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .api-key-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 1px 2px rgba(30, 64, 175, 0.1);
+        }
+
+        .textarea {
+            width: 100%;
+            min-height: 220px;
+            background: rgba(255, 255, 255, 0.98);
+            border: 2px solid rgba(59, 130, 246, 0.1);
+            border-radius: 16px;
+            padding: 18px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+        }
+
+        .textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .code-section {
+            grid-column: 1 / -1;
+        }
+
+        .code-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .language-select {
+            padding: 12px 16px;
+            border: 2px solid rgba(59, 130, 246, 0.2);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.95);
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .language-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .test-section {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid rgba(16, 185, 129, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            margin-top: 25px;
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.1);
+        }
+
+        .test-result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            font-family: monospace;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .test-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #047857;
+            border: 2px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .test-error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+            border: 2px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .detected-lang {
+            background: rgba(14, 165, 233, 0.1);
+            color: #0ea5e9;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid rgba(14, 165, 233, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">Guru Gpt</div>
+            <input type="password" class="api-key-input" placeholder="Enter Gemini API Key" id="apiKey">
+        </div>
+
+        <div class="main-grid">
+            <div class="card">
+                <div class="card-title">Input Params</div>
+                <textarea class="textarea" id="inputParams" placeholder="Enter input parameters (JSON format)&#10;Example: {&quot;x&quot;: 5, &quot;y&quot;: 3}"></textarea>
+            </div>
+            <div class="card">
+                <div class="card-title">Expected Output</div>
+                <textarea class="textarea" id="expectedOutput" placeholder="Enter expected output (optional)&#10;Example: 8"></textarea>
+            </div>
+        </div>
+
+        <div class="card code-section">
+            <div class="card-title">Code Converter</div>
+            <div class="code-controls">
+                <span id="detectedLang" class="detected-lang" style="display: none;"></span>
+                <select class="language-select" id="targetLanguage">
+                    <option value="">Select Target Language</option>
+                    <option value="javascript">JavaScript</option>
+                    <option value="python">Python</option>
+                    <option value="java">Java</option>
+                    <option value="cpp">C++</option>
+                    <option value="csharp">C#</option>
+                    <option value="go">Go</option>
+                    <option value="rust">Rust</option>
+                    <option value="php">PHP</option>
+                </select>
+                <button class="btn btn-primary" id="convertBtn">Convert Code</button>
+            </div>
+            <textarea class="textarea" id="sourceCode" placeholder="Paste your code here..."></textarea>
+            <textarea class="textarea" id="convertedCode" placeholder="Converted code will appear here..." readonly style="margin-top: 15px; background: rgba(240, 240, 240, 0.9);"></textarea>
+            
+            <div class="test-section">
+                <button class="btn btn-success" id="testBtn">Test Cases</button>
+                <div id="testResult" class="test-result" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class CodeConverter {
+            constructor() {
+                this.apiKey = '';
+                this.detectedLanguage = '';
+                this.initializeEventListeners();
+            }
+
+            initializeEventListeners() {
+                document.getElementById('apiKey').addEventListener('input', (e) => {
+                    this.apiKey = e.target.value;
+                });
+
+                document.getElementById('sourceCode').addEventListener('input', (e) => {
+                    this.detectLanguage(e.target.value);
+                });
+
+                document.getElementById('convertBtn').addEventListener('click', () => {
+                    this.convertCode();
+                });
+
+                document.getElementById('testBtn').addEventListener('click', () => {
+                    this.runTests();
+                });
+            }
+
+            detectLanguage(code) {
+                if (!code.trim()) {
+                    document.getElementById('detectedLang').style.display = 'none';
+                    return;
+                }
+
+                const patterns = {
+                    javascript: [/function\s+\w+\s*\(/, /const\s+\w+\s*=/, /let\s+\w+\s*=/, /var\s+\w+\s*=/, /=>\s*{/, /console\.log/],
+                    python: [/def\s+\w+\s*\(/, /import\s+\w+/, /from\s+\w+\s+import/, /print\s*\(/, /if\s+__name__\s*==\s*['"']__main__['"']:/, /:\s*$/m],
+                    java: [/public\s+class\s+\w+/, /public\s+static\s+void\s+main/, /System\.out\.print/, /public\s+\w+\s+\w+\s*\(/],
+                    cpp: [/#include\s*</, /using\s+namespace\s+std/, /int\s+main\s*\(/, /cout\s*<</, /std::/],
+                    csharp: [/using\s+System/, /public\s+class\s+\w+/, /Console\.Write/, /public\s+static\s+void\s+Main/],
+                    go: [/package\s+main/, /import\s+['"']/, /func\s+main\s*\(/, /fmt\.Print/, /func\s+\w+\s*\(/],
+                    rust: [/fn\s+main\s*\(/, /println!/, /let\s+mut\s+\w+/, /use\s+std::/, /fn\s+\w+\s*\(/],
+                    php: [/<\?php/, /echo\s+/, /\$\w+\s*=/, /function\s+\w+\s*\(/]
+                };
+
+                for (const [lang, regexArray] of Object.entries(patterns)) {
+                    const matches = regexArray.filter(regex => regex.test(code));
+                    if (matches.length >= 2) {
+                        this.detectedLanguage = lang;
+                        const langElement = document.getElementById('detectedLang');
+                        langElement.textContent = `Detected: ${lang.charAt(0).toUpperCase() + lang.slice(1)}`;
+                        langElement.style.display = 'inline-block';
+                        return;
+                    }
+                }
+
+                document.getElementById('detectedLang').style.display = 'none';
+                this.detectedLanguage = '';
+            }
+
+            async convertCode() {
+                if (!this.apiKey) {
+                    alert('Please enter your Gemini API key');
+                    return;
+                }
+
+                const sourceCode = document.getElementById('sourceCode').value;
+                const targetLanguage = document.getElementById('targetLanguage').value;
+
+                if (!sourceCode.trim()) {
+                    alert('Please paste some code to convert');
+                    return;
+                }
+
+                if (!targetLanguage) {
+                    alert('Please select a target language');
+                    return;
+                }
+
+                const convertBtn = document.getElementById('convertBtn');
+                const convertedCodeArea = document.getElementById('convertedCode');
+
+                convertBtn.classList.add('loading');
+                convertBtn.textContent = 'Converting...';
+
+                try {
+                    const prompt = `Convert the following ${this.detectedLanguage || 'code'} to ${targetLanguage}. 
+                    Preserve the exact functionality and logic. Only return the converted code without explanations:
+
+                    ${sourceCode}`;
+
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${this.apiKey}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            contents: [{
+                                parts: [{
+                                    text: prompt
+                                }]
+                            }]
+                        })
+                    });
+
+                    const data = await response.json();
+                    console.log('API Response:', data);
+                    
+                    if (!response.ok) {
+                        throw new Error(`API Error ${response.status}: ${data.error?.message || 'Unknown error'}`);
+                    }
+                    
+                    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                        let convertedCode = data.candidates[0].content.parts[0].text;
+                        // Clean up code blocks if present
+                        convertedCode = convertedCode.replace(/```\w*\n?/g, '').trim();
+                        convertedCodeArea.value = convertedCode;
+                    } else {
+                        console.error('Unexpected API response structure:', data);
+                        throw new Error(`API returned unexpected response: ${JSON.stringify(data)}`);
+                    }
+                } catch (error) {
+                    console.error('Conversion error:', error);
+                    alert(`Error converting code: ${error.message}`);
+                } finally {
+                    convertBtn.classList.remove('loading');
+                    convertBtn.textContent = 'Convert Code';
+                }
+            }
+
+            async runTests() {
+                const inputParams = document.getElementById('inputParams').value;
+                const expectedOutput = document.getElementById('expectedOutput').value;
+                const convertedCode = document.getElementById('convertedCode').value;
+                const targetLanguage = document.getElementById('targetLanguage').value;
+                const testResult = document.getElementById('testResult');
+
+                if (!convertedCode.trim()) {
+                    alert('Please convert some code first');
+                    return;
+                }
+
+                if (!inputParams.trim()) {
+                    alert('Please provide input parameters');
+                    return;
+                }
+
+                testResult.style.display = 'block';
+                testResult.className = 'test-result';
+                testResult.textContent = 'Running tests...';
+
+                try {
+                    let params;
+                    try {
+                        params = JSON.parse(inputParams);
+                    } catch (e) {
+                        throw new Error('Invalid JSON in input parameters');
+                    }
+
+                    let result;
+                    
+                    if (targetLanguage === 'javascript') {
+                        // For JavaScript, we can execute directly
+                        result = await this.executeJavaScript(convertedCode, params);
+                    } else {
+                        // For other languages, simulate execution using Gemini API
+                        result = await this.simulateExecution(convertedCode, params, targetLanguage);
+                    }
+
+                    // Check against expected output if provided
+                    if (expectedOutput.trim()) {
+                        let expected;
+                        try {
+                            expected = JSON.parse(expectedOutput);
+                        } catch (e) {
+                            expected = expectedOutput.trim();
+                        }
+
+                        const isMatch = JSON.stringify(result) === JSON.stringify(expected);
+                        testResult.className = `test-result ${isMatch ? 'test-success' : 'test-error'}`;
+                        testResult.innerHTML = `
+                            <strong>Input:</strong> ${JSON.stringify(params)}<br>
+                            <strong>Expected:</strong> ${JSON.stringify(expected)}<br>
+                            <strong>Actual:</strong> ${JSON.stringify(result)}<br>
+                            <strong>Status:</strong> ${isMatch ? '✅ PASSED' : '❌ FAILED'}
+                        `;
+                    } else {
+                        testResult.className = 'test-result test-success';
+                        testResult.innerHTML = `
+                            <strong>Input:</strong> ${JSON.stringify(params)}<br>
+                            <strong>Output:</strong> ${JSON.stringify(result)}<br>
+                            <strong>Status:</strong> ✅ EXECUTED
+                        `;
+                    }
+                } catch (error) {
+                    testResult.className = 'test-result test-error';
+                    testResult.textContent = `❌ Error: ${error.message}`;
+                }
+            }
+
+            async executeJavaScript(code, params) {
+                try {
+                    // Create a safe execution environment
+                    const func = new Function('params', `
+                        ${code}
+                        // Try to find and call the main function
+                        const functionNames = Object.getOwnPropertyNames(this).filter(name => 
+                            typeof this[name] === 'function' && name !== 'constructor'
+                        );
+                        
+                        if (functionNames.length > 0) {
+                            return this[functionNames[0]](params);
+                        }
+                        
+                        // If no function found, try to execute the code directly
+                        return eval(code);
+                    `);
+                    
+                    return func.call({}, params);
+                } catch (error) {
+                    throw new Error(`JavaScript execution error: ${error.message}`);
+                }
+            }
+
+            async simulateExecution(code, params, language) {
+                if (!this.apiKey) {
+                    throw new Error('API key required for code simulation');
+                }
+
+                const prompt = `Simulate the execution of this ${language} code with the given input parameters.
+                Only return the output value, no explanations:
+
+                Code:
+                ${code}
+
+                Input parameters: ${JSON.stringify(params)}`;
+
+                try {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${this.apiKey}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            contents: [{
+                                parts: [{
+                                    text: prompt
+                                }]
+                            }]
+                        })
+                    });
+
+                    const data = await response.json();
+                    console.log('Simulation API Response:', data);
+                    
+                    if (!response.ok) {
+                        throw new Error(`API Error ${response.status}: ${data.error?.message || 'Unknown error'}`);
+                    }
+                    
+                    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                        let result = data.candidates[0].content.parts[0].text.trim();
+                        // Try to parse as JSON, otherwise return as string
+                        try {
+                            return JSON.parse(result);
+                        } catch (e) {
+                            return result;
+                        }
+                    } else {
+                        throw new Error(`Simulation failed: ${JSON.stringify(data)}`);
+                    }
+                } catch (error) {
+                    throw new Error(`Simulation error: ${error.message}`);
+                }
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            new CodeConverter();
+        });
+    </script>
+</body>
+</html>
